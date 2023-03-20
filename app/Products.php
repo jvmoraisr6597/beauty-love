@@ -22,9 +22,6 @@ class Products extends Model
         'description' => [
             'searchable' => true,
         ],
-        'price' => [
-            'searchable' => true,
-        ],
         'created_at' => [
             'searchable' => true,
         ],
