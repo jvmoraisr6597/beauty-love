@@ -16,9 +16,8 @@ class ProductsRequest extends FormRequest
         return [
             'name' => 'required|min:3',
             'description' => 'nullable',
-            'categories_id' => 'nullable|exists:categories,id',
-            'image_url' => 'required',
-            'brands' => 'required'
+            'categories_id' => 'nullable',
+            'image_url' => 'required'
         ];
     }
 

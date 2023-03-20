@@ -32,54 +32,52 @@
                     <form role="form" id="editProducts" method="post" action="{{'/products/' . $product->id . '?redirect=true'}}">
                         @csrf
                         {{ method_field('PUT') }}
-                      <div class="form-group row">
-                        <div class="col">
-                            <label for="name" class="form-control-label">Nome do Produto:</label>
-                            <input id="name" type="text" class="form-control {{ $errors->has('name') ? ' is-invalid' : '' }}" placeholder="Nome" name="name" id="name" required value="{{$product->name}}">
+                        <div class="form-group row">
+                            <div class="col">
+                                <label for="name" class="form-control-label">Nome do Produto:</label>
+                                <input id="name" type="text" class="form-control {{ $errors->has('name') ? ' is-invalid' : '' }}" placeholder="Nome" name="name" id="name" required value="{{$product->name}}">
+                            </div>
+                            <div class="col">
+                                <label for="description" class="form-control-label">Descrição do Produto:</label>
+                            <input id="description" type="text" class="form-control {{ $errors->has('description') ? ' is-invalid' : '' }}" placeholder="Descrição" required name="description" value="{{$product->description}}">
+                            </div>
                         </div>
-                        <div class="col">
-                            <label for="price" class="form-control-label">Preço do Produto:</label>
-                            <input id="price" type="number" step=0.01 class="form-control {{ $errors->has('price') ? ' is-invalid' : '' }}" placeholder="0000.00" name="price" id="price" value="{{$product->price}}">
+                        <div class="form-group row">
+                            <div class="col">
+                                <label for="categories_id" class="form-control-label">Categorias do Produto:</label>
+                                <select id="branch" class="form-control {{ $errors->has('branch') ? ' is-invalid' : '' }}" required name="branch" multiple>
+                                    <option value="">Selecione as Categoria do produto</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{$category->id}}" {{ in_array($category->id, $product->categories_id) ? 'selected' : '' }}>{{$category->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <input type="hidden" name="categories_id" id="categories_id">
                         </div>
-                      </div>
-                      <div class="form-group row">
-                        <div class="col">
-                            <label for="description" class="form-control-label">Descrição do Produto:</label>
-                          <input id="description" type="text" class="form-control {{ $errors->has('description') ? ' is-invalid' : '' }}" placeholder="Descrição" required name="description" value="{{$product->description}}">
+                        <div class="form-group row">
+                            <div class="col">
+                                <label for="image_url" class="form-control-label">Imagem do Produto:</label>
+                                <input id="image_url" type="text" class="form-control {{ $errors->has('image_url') ? ' is-invalid' : '' }}" placeholder="https://www.repositoryimage.com.br/path/exampleFile.jpg" required name="image_url" value="{{$product->image_url}}">
+                            </div>
                         </div>
-                      </div>
-                      <div class="form-group row">
-                        <div class="col">
-                            <label for="image_url" class="form-control-label">Imagem do Produto:</label>
-                          <input id="image_url" type="text" class="form-control {{ $errors->has('image_url') ? ' is-invalid' : '' }}" placeholder="https://www.repositorieimage.com.br/path/exampleFile.jpg" required name="image_url" value="{{$product->image_url}}">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <div class="col">
-                            <label for="product_url" class="form-control-label">Link do Produto:</label>
-                          <input id="product_url" type="text" class="form-control {{ $errors->has('product_url') ? ' is-invalid' : '' }}" placeholder="https://www.examplestore.com.br/productExample.html" name="product_url" value="{{$product->product_url}}">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <div class="col">
-                            <label for="brands_id" class="form-control-label">Marca do Produto:</label>
-                            <select id="brands_id" class="form-control {{ $errors->has('brands_id') ? ' is-invalid' : '' }}" required name="brands_id" value="{{$product->brands_id}}">
-                                <option value="">Selecione a Marca do produto</option>
-                                @foreach($brands as $brand)
-                                    <option value="{{$brand->id}}" {{ ( $product->brands_id == $brand->id ) ? 'selected' : '' }}>{{ $brand->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label for="categories_id" class="form-control-label">Categoria do Produto:</label>
-                            <select id="categories_id" class="form-control {{ $errors->has('categories_id') ? ' is-invalid' : '' }}" required name="categories_id" value="{{$product->categories_id}}">
-                                <option value="">Selecione a Categoria do produto</option>
-                                @foreach($categories as $category)
-                                    <option value="{{$category->id}}" {{ ( $product->categories_id == $category->id ) ? 'selected' : '' }}>{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                      </div>
+                        @foreach($brands as $brand)
+                            <h2>{{ $brand->name }}</h2>
+                            <?php
+                                $product_array = json_decode(json_encode($product), true);
+                                $product_url = array_key_exists('product_url'. $brand->id, $product_array) ? $product_array['product_url'. $brand->id] : null;
+                                $price = array_key_exists('price'. $brand->id, $product_array) ? $product_array['price'. $brand->id] : null;
+                            ?>
+                            <div class="form-group row">
+                                <div class="col">
+                                    <label for="product_url" class="form-control-label">Link do Produto:</label>
+                                    <input id="product_url" type="text" class="form-control {{ $errors->has('product_url') ? ' is-invalid' : '' }}" placeholder="https://www.examplestore.com.br/productExample.html" name="product_url{{$brand->id}}" value="{{ $product_url }}">
+                                </div>
+                                <div class="col">
+                                    <label for="price" class="form-control-label">Preço do Produto:</label>
+                                    <input id="price" type="number" step=0.01 class="form-control {{ $errors->has('price') ? ' is-invalid' : '' }}" placeholder="0000.00" name="price{{$brand->id}}" id="price" value="{{ $price }}">
+                                </div>
+                            </div>
+                        @endforeach
                       <div class="text-center">
                         <input type="submit" class="btn btn-success" value="Atualizar Produto">
                       </div>
@@ -97,7 +95,23 @@
 <!-- Inclusão do Plugin jQuery Validation-->
 <script src="http://jqueryvalidation.org/files/dist/jquery.validate.js"></script>
 <script>
+    $(document).ready(function() {
+    var selected = $(this).find("option:selected"); //get current selected value
+    var arrSelected = []; //Array to store your multiple value in stack
+    selected.each(function(){
+        arrSelected.push($(this).val()); //Stack the value
+    });
+    $('#categories_id').val(arrSelected);
+    $('#branch').on('change', function(){
+        var selected = $(this).find("option:selected"); //get current selected value
+        var arrSelected = []; //Array to store your multiple value in stack
+        selected.each(function(){
+        arrSelected.push($(this).val()); //Stack the value
+        });
+        $('#categories_id').val(arrSelected); //It will set the multiple selected value to input new_branch
+    });
 
+    });
   jQuery.validator.setDefaults({
   highlight: function(element) {
       jQuery(element).closest('.form-control').addClass('is-invalid');

@@ -55,12 +55,28 @@ class ProductsController extends Controller
      */
     public function store(ProductsRequest $request)
     {
-        $request = $request->validated();
-        $product = Products::create($request);
-        $brands = gettype($request['brands']) == "string" ? json_decode($request['brands']) : $request['brands'];
+        $requestAttrs = $request->validated();
+        $product = Products::create($requestAttrs);
+        $request = $request->all();
+        $brands = [];
+        if (array_key_exists('brands', $request)) {
+            $brands = gettype($request['brands']) == "string" ? json_decode($request['brands']) : $request['brands'];
+        } else {
+            $sourcers = Brands::all();
+            foreach ($sourcers as $sourcer) {
+                if (array_key_exists('product_url' . $sourcer->id, $request) && $request['product_url'. $sourcer->id]) {
+                    $brand = [
+                        "brands_id" => $sourcer->id,
+                        "product_url" => strval($request['product_url'. $sourcer->id]),
+                        "price" => $request['price'. $sourcer->id]
+                    ];
+                    $brands[] = $brand;
+                }
+            } 
+        }
+        
         foreach ($brands as $brand) {
-            print_r($brand['product_url']);
-            BrandPriceLinkProducts::create([
+            BrandPriceLinkProducts::updateOrCreate(["products_id" => $product->id, "brands_id" => $brand['brands_id']], [
                 "products_id" => $product->id,
                 "brands_id" => $brand['brands_id'],
                 "product_url" => strval($brand['product_url']),
@@ -78,6 +94,10 @@ class ProductsController extends Controller
     }
 
     public function delete(Products $product) {
+        $brands = BrandPriceLinkProducts::where('products_id', '=', $product->id)->get();
+        foreach ($brands as $brand) {
+            $brand->delete();
+        }
         return $product->delete();
     }
 
@@ -85,6 +105,36 @@ class ProductsController extends Controller
     {
         $request = request()->all();
         $product->update($request);
+        $brands = [];
+        if (array_key_exists('brands', $request)) {
+            $brands = gettype($request['brands']) == "string" ? json_decode($request['brands']) : $request['brands'];
+        } else {
+            $sourcers = Brands::all();
+            foreach ($sourcers as $sourcer) {
+                if (array_key_exists('product_url' . $sourcer->id, $request) && $request['product_url'. $sourcer->id]) {
+                    $brand = [
+                        "brands_id" => $sourcer->id,
+                        "product_url" => strval($request['product_url'. $sourcer->id]),
+                        "price" => $request['price'. $sourcer->id]
+                    ];
+                    $brands[] = $brand;
+                } elseif ($request['product_url'. $sourcer->id] == null) {
+                    $brandToDelete = BrandPriceLinkProducts::where("products_id", "=", $product->id)->where("brands_id", "=", $sourcer->id)->first();
+                    if (count($brandToDelete)) {
+                        $brandToDelete->delete();
+                    }
+                }
+            } 
+        }
+        
+        foreach ($brands as $brand) {
+            BrandPriceLinkProducts::updateOrCreate(["products_id" => $product->id, "brands_id" => $brand['brands_id']], [
+                "products_id" => $product->id,
+                "brands_id" => $brand['brands_id'],
+                "product_url" => strval($brand['product_url']),
+                "price" => $brand['price']
+            ]);
+        }
         if (array_key_exists('redirect', $request) && $request['redirect']) {
             return redirect('/products');
         }
@@ -98,6 +148,12 @@ class ProductsController extends Controller
     {
         $brands = Brands::all();
         $categories = Categories::all();
+        $productLinks = BrandPriceLinkProducts::where('products_id', '=', $product->id)->get();
+        foreach ($productLinks as $productLink) {
+            $product['product_url' . $productLink['brands_id']] = $productLink['product_url'];
+            $product['price' . $productLink['brands_id']] = $productLink['price'];
+        }
+        $product['categories_id'] = explode(",", $product->categories_id);
         return view('products.edit', compact('brands', 'categories'))->with('product', $product);
     }
 
@@ -106,7 +162,18 @@ class ProductsController extends Controller
         $products = $this->csvToArray($request->file('file'));
         foreach ($products as $product) {
             $mountedProduct = $this->mountStructureProduct($product);
-            if ($mountedProduct) Products::updateOrCreate(["product_url" => $mountedProduct['product_url']], $mountedProduct);
+            if ($mountedProduct) {
+                $brands = gettype($mountedProduct['brands']) == "string" ? json_decode($mountedProduct['brands']) : $mountedProduct['brands'];
+                $product = Products::updateOrCreate(["name" => $mountedProduct['name']], $mountedProduct);
+                foreach ($brands as $brand) {
+                    BrandPriceLinkProducts::updateOrCreate(["products_id" => $product->id, "brands_id" => $brand['brands_id']], [
+                        "products_id" => $product->id,
+                        "brands_id" => $brand['brands_id'],
+                        "product_url" => strval($brand['product_url']),
+                        "price" => $brand['price']
+                    ]);
+                }
+            }
         }
         return json_encode([
             "code" => 200,
@@ -128,10 +195,14 @@ class ProductsController extends Controller
     {
         if (!$product || $product[0] == "CODIGO DO LINK") return false;
         $productMounted = [];
+        $brand = [
+            'brands_id' => Brands::where('name', '=', $product[1])->first()->id,
+            'product_url' => explode('"><', explode('<a href="', $product[0])[1])[0],
+            'price' => explode("R$", $product[4])[1]
+        ];
         $productMounted['name'] = $product[2];
-        $productMounted['price'] = explode("R$", $product[4])[1];
-        $productMounted['images_url'] = explode('" ></a><IMG', explode('IMG border=0 src="', $product[0])[1])[0];
-        $productMounted['product_url'] = explode('"><', explode('<a href="', $product[0])[1])[0];
+        $productMounted['image_url'] = explode('" ></a><IMG', explode('IMG border=0 src="', $product[0])[1])[0];
+        $productMounted['brands'][] = $brand;
         $productMounted['description'] = $product[5];
         return $productMounted;
     }

@@ -70,11 +70,6 @@ import 'sweetalert2/src/sweetalert2.scss'
                     orderable: true,
                 },
                 {
-                    label: 'price',
-                    name: 'price',
-                    orderable: true,
-                },
-                {
                     label: 'Última atualização',
                     name: 'updated_at',
                     orderable: true,
