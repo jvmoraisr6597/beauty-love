@@ -3016,10 +3016,6 @@ __webpack_require__.r(__webpack_exports__);
         name: 'description',
         orderable: true
       }, {
-        label: 'price',
-        name: 'price',
-        orderable: true
-      }, {
         label: 'Última atualização',
         name: 'updated_at',
         orderable: true,
