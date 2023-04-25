@@ -17,6 +17,8 @@ services:
       - ./:/var/www
     networks:
       - travellist
+    extra_hosts:
+      - "client_max_body_size 20M;"
 
   #Nginx Service
   webserver:
