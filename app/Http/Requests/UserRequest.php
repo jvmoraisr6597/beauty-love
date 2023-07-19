@@ -9,16 +9,6 @@ use Illuminate\Foundation\Http\FormRequest;
 class UserRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return auth()->check();
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
@@ -36,8 +26,9 @@ class UserRequest extends FormRequest
                 $this->route()->user ? 'nullable' : 'required', 'confirmed', 'min:6'
             ],
             'roles' => [
-                'required', 'min:1'
-            ]
+                'nullable'
+            ],
+            'api' => ['nullable']
         ];
     }
 }

@@ -16,7 +16,7 @@ class Comments extends JsonResource
     {
         return [
             'id' => $this->id,
-            'clients_id' => $this->clients_id,
+            'user_id' => $this->user_id,
             'products_id' => $this->products_id,
             'title' => $this->title,
             'description' => $this->description,

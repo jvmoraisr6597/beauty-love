@@ -28,7 +28,8 @@
         "spatie/array-to-xml": "^2.16",
         "spatie/laravel-activitylog": "^3.17",
         "spatie/laravel-permission": "^3.16",
-        "staudenmeir/laravel-upsert": "^1.0"
+        "staudenmeir/laravel-upsert": "^1.0",
+        "tymon/jwt-auth": "^1.0@dev"
     },
     "require-dev": {
         "facade/ignition": "^2.0",

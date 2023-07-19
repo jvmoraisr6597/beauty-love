@@ -15,7 +15,7 @@ class CommentsRequest extends FormRequest
     public function rules()
     {
         return [
-            'clients_id' => [
+            'user_id' => [
                 'required'
             ],
             'products_id' => [

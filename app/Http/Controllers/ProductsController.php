@@ -31,8 +31,33 @@ class ProductsController extends Controller
         return new ProductsResource($product);
     }
 
-    public function getProductsJson() {
-        return ProductsResource::collection(Products::all());
+    public function getProductsJson(Request $request) {
+        $request = $request->all();
+        $products = Products::query()
+            ->when(array_key_exists('search', $request), function ($query) use ($request) {
+                $search = $request['search'];
+                return $query->where('name', 'LIKE', "%$search%");
+            })
+            ->when(array_key_exists('evaluation', $request), function ($query) use ($request) {
+                return $query->where('evaluation', '>=', $request['evaluation']);
+            })
+            ->when(array_key_exists('order_by', $request), function ($query) use ($request) {
+                switch ($request['order_by']) {
+                    case 'like':
+                        return $query->orderBy('like', 'desc');
+                        break;
+                    case 'asc':
+                        return $query->orderBy('created_at', 'asc');
+                        break;
+                    case 'desc':
+                        return $query->orderBy('created_at', 'desc');
+                        break;
+                    default:
+                        break;
+                }
+            })
+            ->get();
+        return ProductsResource::collection($products);
     }
 
     public function getProducts(Request $request)

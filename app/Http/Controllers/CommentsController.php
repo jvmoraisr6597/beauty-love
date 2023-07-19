@@ -9,6 +9,7 @@ use App\Brands;
 use App\Categories;
 use App\Http\Resources\Comments as CommentsResource;
 use JamesDordoy\LaravelVueDatatable\Http\Resources\DataTableCollectionResource;
+use App\Products;
 
 class CommentsController extends Controller
 {
@@ -47,6 +48,13 @@ class CommentsController extends Controller
     {
         Comments::create($request->validated());
         $request = $request->all();
+        $product = Products::find($request['products_id']);
+        if (intval($product->evaluation) == 0) {
+            $product->evaluation = $request['rate'];
+        } else {
+            $product->evaluation = ($product->evaluation + $request['rate'])/2;
+        }
+        $product->save();
         return json_encode([
             "code" => 200,
             "message" => "Success"

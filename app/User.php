@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Passport\HasApiTokens;
+use JamesDordoy\LaravelVueDatatable\Traits\LaravelVueDatatableTrait;
 
 class User extends Authenticatable
 {
@@ -22,6 +23,23 @@ class User extends Authenticatable
         'name', 'email', 'password',
     ];
 
+    protected $dataTableColumns = [
+        'id' => [
+            'searchable' => true,
+        ],
+        'name' => [
+            'searchable' => true,
+        ],
+        'email' => [
+            'searchable' => true,
+        ],
+        'created_at' => [
+            'searchable' => true,
+        ],
+        'updated_at' => [
+            'searchable' => true,
+        ]
+    ];
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -39,4 +57,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function comments()
+    {
+        return $this->hasMany('App\Comments');
+    }
 }

@@ -37,7 +37,7 @@ import 'sweetalert2/src/sweetalert2.scss'
                 },
                 {
                     label: 'Id do Cliente',
-                    name: 'clients_id',
+                    name: 'user_id',
                     orderable: true,
                 },
                 {

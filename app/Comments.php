@@ -9,13 +9,13 @@ class Comments extends Model
 {
     use LaravelVueDatatableTrait;
 
-    protected $fillable = ['clients_id', 'products_id', 'title', 'description', 'status', 'rate'];
+    protected $fillable = ['user_id', 'products_id', 'title', 'description', 'status', 'rate'];
 
     protected $dataTableColumns = [
         'id' => [
             'searchable' => true,
         ],
-        'clients_id' => [
+        'user_id' => [
             'searchable' => true,
         ],
         'products_id' => [
@@ -43,9 +43,9 @@ class Comments extends Model
         return $this->belongsTo('App\Products');
     }
 
-    public function clients()
+    public function user()
     {
-        return $this->belongsTo('App\Clients');
+        return $this->belongsTo('App\User');
     }
 
 }

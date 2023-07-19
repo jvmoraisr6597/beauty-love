@@ -23,6 +23,8 @@ class Products extends JsonResource
             'description' => $this->description,
             'image_url' => $this->image_url,
             'brand_price_link_products' => AppBrandPriceLinkProducts::where('products_id', '=', $this->id)->get(),
+            'like' => $this->like,
+            'evaluation' => $this->evaluation,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];

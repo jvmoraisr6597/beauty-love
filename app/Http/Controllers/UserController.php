@@ -8,6 +8,8 @@ use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Hash;
 use App\Permission;
 use App\Role;
+use App\Http\Resources\Clients as ClientsResource;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -117,5 +119,61 @@ class UserController extends Controller
 
         $user->syncRoles($roles);
         return $user;
+    }
+
+
+    public function showApi(User $user) {
+        return new ClientsResource($user);
+    }
+
+    public function getClientsJson() {
+        return ClientsResource::collection(User::all());
+    }
+
+    public function getClients(Request $request)
+    {
+        $length = $request->input('length');
+        $orderBy = $request->input('column'); //Index
+        $orderByDir = $request->input('dir', 'asc');
+        $searchValue = $request->input('search');
+        
+        $query = User::eloquentQuery($orderBy, $orderByDir, $searchValue);
+        $data = $query->paginate($length);
+        
+        return new DataTableCollectionResource($data);
+    }
+
+    public function storeApi(UserRequest $request)
+    {
+        // Create the user
+        if (!User::create($request->merge(['password' => Hash::make($request->get('password'))])->all())) {
+            return json_encode([
+                "code" => 402,
+                "message" => "Unable to create user"
+            ]);
+        }
+
+        return json_encode([
+            "code" => 200,
+            "message" => "Success"
+        ]);
+    }
+
+    public function deleteApi(User $user) {
+        return $user->delete();
+    }
+
+    public function updateApi(Request $request, User $user)
+    {
+        // Create the user
+        $user->update(
+            $request->merge(['password' => Hash::make($request->get('password'))])
+            ->except([$request->get('password') ? '' : 'password'])
+        );
+
+        return json_encode([
+            "code" => 200,
+            "message" => "Success"
+        ]);
     }
 }

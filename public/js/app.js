@@ -2375,7 +2375,7 @@ __webpack_require__.r(__webpack_exports__);
         orderable: true
       }, {
         label: 'Id do Cliente',
-        name: 'clients_id',
+        name: 'user_id',
         orderable: true
       }, {
         label: 'Id do Produto',

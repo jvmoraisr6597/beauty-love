@@ -10,7 +10,7 @@ class Products extends Model
 {
     use LaravelVueDatatableTrait;
 
-    protected $fillable = ['name', 'description', 'categories_id', 'brands_id', 'price', 'image_url', 'product_url'];
+    protected $fillable = ['name', 'description', 'categories_id', 'brands_id', 'price', 'image_url', 'product_url', 'like', 'evaluation'];
 
     protected $dataTableColumns = [
         'id' => [
