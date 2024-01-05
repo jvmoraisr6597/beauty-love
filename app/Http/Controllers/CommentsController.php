@@ -92,4 +92,14 @@ class CommentsController extends Controller
             ]);
         }
     }
+
+    public function getCommentsByProduct(Products $product)
+    {
+        return CommentsResource::collection(Comments::where('products_id', '=', $product->id)->get());
+    }
+
+    public function getCommentsByCustomer($user_id)
+    {
+        return CommentsResource::collection(Comments::where('user_id', '=', $user_id)->get());
+    }
 }

@@ -35,6 +35,11 @@ class Products extends Model
         return $this->hasMany('App\Categories');
     }
 
+    public function brands()
+    {
+        return $this->hasMany('App\Brands');
+    }
+
     public function brandPriceLinkProducts()
     {
         return $this->hasMany(BrandPriceLinkProducts::class);

@@ -56,6 +56,22 @@ class ProductsController extends Controller
                         break;
                 }
             })
+            ->when(array_key_exists('categories', $request), function ($queryCategories) use ($request) {
+                $categoryIds = explode(",", $request['categories']);
+                return $queryCategories->where(function ($query) use ($categoryIds) {
+                    foreach ($categoryIds as $categoryId) {
+                        $query->orWhereRaw("FIND_IN_SET(?, categories_id)", [$categoryId]);
+                    }
+                });
+            })
+            ->when(array_key_exists('brands', $request), function ($queryBrands) use ($request) {
+                $brandsIds = explode(",", $request['brands']);
+                return $queryBrands->where(function ($query) use ($brandsIds) {
+                    foreach ($brandsIds as $brandId) {
+                        $query->orWhereRaw("FIND_IN_SET(?, brands_id)", [$brandId]);
+                    }
+                });
+            })
             ->get();
         return ProductsResource::collection($products);
     }

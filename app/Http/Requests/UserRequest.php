@@ -28,7 +28,17 @@ class UserRequest extends FormRequest
             'roles' => [
                 'nullable'
             ],
-            'api' => ['nullable']
+            'api' => ['nullable'],
+            "last_name" => ['nullable'],
+            "user_name" => ['nullable'],
+            "phrase" => ['nullable'],
+            "birth_date" => ['nullable'],
+            "gender" =>['nullable'],
+            "state" => ['nullable'],
+            "city" => ['nullable'],
+            "newsletter_email" => ['nullable'],
+            "terms_and_conditions" => ['nullable'],
+            "image" => ['nullable']
         ];
     }
 }

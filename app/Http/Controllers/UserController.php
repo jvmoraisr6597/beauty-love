@@ -10,6 +10,7 @@ use App\Permission;
 use App\Role;
 use App\Http\Resources\Clients as ClientsResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class UserController extends Controller
 {
@@ -45,6 +46,18 @@ class UserController extends Controller
     public function store(UserRequest $request, User $model)
     {
         // Create the user
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            // Gere um nome único para a imagem
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            
+            // Mova a imagem para o diretório de armazenamento (geralmente 'public/storage')
+            $image->storeAs('public', $imageName);
+            
+            // Salve os detalhes da imagem no banco de dados (se você tiver uma tabela de imagens)
+            // Exemplo usando um modelo chamado Image:
+            $request['image'] = storage_path('app/public/' . $imageName);
+        }
         if ($user = $model->create($request->merge(['password' => Hash::make($request->get('password'))])->all())) {
             $this->syncPermissions($request, $user);
         } else {
@@ -165,11 +178,48 @@ class UserController extends Controller
 
     public function updateApi(Request $request, User $user)
     {
-        // Create the user
-        $user->update(
-            $request->merge(['password' => Hash::make($request->get('password'))])
-            ->except([$request->get('password') ? '' : 'password'])
-        );
+        $request = $request->all();
+
+        unset($request['password']);
+        unset($request['password_confirmation']);
+
+        $user->update($request);
+
+        return json_encode([
+            "code" => 200,
+            "message" => "Success"
+        ]);
+    }
+
+    public function updatePasswordApi(Request $request, User $user)
+    {
+        $request->validate([
+            'password' => 'required|string|min:4|confirmed',
+        ]);
+    
+        if (!Hash::check($request->current_password, $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['Senha atual incorreta'],
+            ]);
+        }
+
+        // Atualize a senha do usuário
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+        return json_encode([
+            "code" => 200,
+            "message" => "Success"
+        ]);
+    }
+
+    public function updatePasswordFirstStep(Request $request)
+    {
+        $email = $request->all()['email'];
+        $rand = rand(100000, 999999);
+        Redis::sadd($email, $rand);
+
+        print(Redis::spop($email));
 
         return json_encode([
             "code" => 200,

@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CustomAccessTokenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,10 +15,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 //Permissions
+Route::put('/clients/forgotPassword', 'UserController@updatePasswordFirstStep')->name('user.updatePasswordFirstStep.api');
+Route::post('oauth/token', [CustomAccessTokenController::class, 'login']);
 Route::post('/clients', 'UserController@storeApi')->name('user.store.api');
 Route::get('/clients', 'UserController@getClientsJson')->name('user.getall.api');
 Route::get('/clients/{user}', 'UserController@showApi')->name('user.show.api');
 Route::put('/clients/{user}', 'UserController@updateApi')->name('user.update.api');
+Route::put('/clients/{user}/updatePassword', 'UserController@updatePasswordApi')->name('user.updatePassword.api');
 Route::delete('/clients/{user}', 'UserController@deleteApi')->name('user.delete.api');
 
 Route::get('/products/{product}', 'ProductsController@show')->name('products.show.api');
@@ -28,6 +32,8 @@ Route::get('/brands/{brand}', 'BrandsController@show')->name('brands.show.api');
 Route::get('/brands', 'BrandsController@getbrandsJson')->name('brands.index.api');
 Route::get('/comments/{comment}', 'CommentsController@show')->name('comment.show.api');
 Route::get('/comments', 'CommentsController@getCommentsJson')->name('comment.index.api');
+Route::get('/comments/products/{product}', 'CommentsController@getCommentsByProduct')->name('comment.byProduct.api');
+Route::get('/comments/user/{user_id}', 'CommentsController@getCommentsByCustomer')->name('comment.byCustomer.api');
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/products', 'ProductsController@store')->name('products.store.api');

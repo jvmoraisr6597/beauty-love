@@ -35,4 +35,9 @@ class Brands extends Model
     {
         return $this->hasMany(BrandPriceLinkProducts::class);
     }
+
+    public function products()
+    {
+        return $this->belongsToMany(Products::class);
+    }
 }

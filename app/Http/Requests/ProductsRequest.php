@@ -17,6 +17,7 @@ class ProductsRequest extends FormRequest
             'name' => 'required|min:3',
             'description' => 'nullable',
             'categories_id' => 'nullable',
+            'brands_id' => 'nullable',
             'image_url' => 'required'
         ];
     }
